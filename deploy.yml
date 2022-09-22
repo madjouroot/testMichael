@@ -1,0 +1,11 @@
+---
+- name: install apache using docker
+  hosts: prod
+  gather_facts: false
+  become: yes
+  vars:
+    ansible_sudo_pass: vagrant	
+  roles:
+   - role: deploy
+     
+
