@@ -1,0 +1,39 @@
+---
+# tasks file for deploy
+- name: install epel-release python.
+  yum:
+    name: epel-release 
+    state: present
+- name: Install python3-pip module
+  yum: 
+    name: python3-pip 
+    state: present  
+    update_cache: yes
+- name: installing pretasks
+  pip: 
+    name: docker-py 
+    executable: pip3
+- name: Ensure docker daemon is installed
+#  service:
+#   name: docker
+#   state: started
+#     enabled: yes
+#    daemon-reload: yes
+  yum:
+    name: docker
+    state: present
+    update_cache: yes
+- name: Ensure docker daemon is running
+  service:
+    name: docker
+    state: started
+    enabled: yes
+    daemon-reload: yes
+- name: Create a data container
+  docker_container:
+    name: webapp
+    image: httpd
+    state: started
+    ports:
+      - "80:80"
+
