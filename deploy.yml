@@ -1,11 +1,17 @@
 ---
 - name: install apache using docker
   hosts: prod
-  gather_facts: false
+  gather_facts: true
   become: yes
+  vars_files:
+   - files/secrets/credentials.yml
   vars:
-    ansible_sudo_pass: vagrant	
+   system_user: vagrant
+   #remote_user: "{{ system_user }}"
+   #vars:
+    #ansible_sudo_pass: vagrant	
   roles:
    - role: deploy
-     
+   #- role: ansible-role-centos-docker-compose-setup 
+   - role: ansible-role-containerized-wordpress  
 

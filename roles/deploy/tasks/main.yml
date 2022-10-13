@@ -1,39 +1,78 @@
 ---
 # tasks file for deploy
-- name: install epel-release python.
-  yum:
-    name: epel-release 
+- name: install some packages #epel-release python.
+  package:
+    name: "{{ item }}" #epel-release 
     state: present
+  when: ansible_distribution== "CentOS"
+  loop:
+    - epel-release
+    - git
+    - wget
+  tags: un
 - name: Install python3-pip module
   yum: 
     name: python3-pip 
     state: present  
     update_cache: yes
+  tags: deux
 - name: installing pretasks
   pip: 
     name: docker-py 
     executable: pip3
+  tags: trois
 - name: Ensure docker daemon is installed
-#  service:
-#   name: docker
-#   state: started
-#     enabled: yes
-#    daemon-reload: yes
   yum:
     name: docker
     state: present
     update_cache: yes
+  tags: quatre
 - name: Ensure docker daemon is running
   service:
     name: docker
     state: started
     enabled: yes
     daemon-reload: yes
+  tags: cinq
+- name: template file copy
+  template:
+    src: index.html.j2
+    dest: /home/vagrant/index.html
+  tags: six
 - name: Create a data container
   docker_container:
     name: webapp
     image: httpd
     state: started
     ports:
-      - "80:80"
+      - "8000:8000"
+    volumes:
+      - /home/vagrant/index.html:/usr/local/apache2/htdocs/index.html
+  tags: sept
+- name: create user ww_data_for_wordpress
+  user:
+    name: "www-data"
+    state: present
+  tags: huit
 
+#- name: Stop the Docker service
+#  ignore_errors: yes
+#  service:
+#    name: docker
+#    state: stopped
+#  tags: neuf
+  
+    
+#- name: Remove the docker-ee package (enterprise)
+#  ignore_errors: yes
+#  yum:
+#    name: docker-ee
+#    state: removed
+#  tags: dix
+
+#- name: Remove the docker-ce package
+#  ignore_errors: yes
+#  yum:
+#    name: docker-ce
+#    state: removed
+#  tags: onze
